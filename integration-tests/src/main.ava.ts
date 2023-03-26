@@ -31,3 +31,38 @@ test.afterEach.always(async (t) => {
 });
 
 // TODO: Add functiont test
+test('Returns the default number', async (t) => {
+  const { contract } = t.context.accounts;
+  const num: Number = await contract.view('get_number', {});
+  t.is(num, 0);
+});
+
+test('Increase number', async (t) => {
+  const { root, contract } = t.context.accounts;
+  await root.call(contract, 'increase_number', {});
+  const num: number = await contract.view('get_number', {});
+  t.is(num, 1);
+});
+
+test('Decrease number', async (t) => {
+  const { root, contract } = t.context.accounts;
+  await root.call(contract, 'increase_number', {});
+  await root.call(contract, 'decrease_number', {});
+
+  const num: number = await contract.view('get_number', {});
+  t.is(num, 0);
+});
+
+test('Payable function with increase 10 unit', async (t) => {
+  const { root, contract } = t.context.accounts;
+  await root.call(contract, 'payable_function', {}, { attachedDeposit: "100" });
+  const num: number = await contract.view('get_number', {});
+  t.is(num, 10);
+});
+
+test('Private funciton - reset number', async (t) => {
+  const { contract } = t.context.accounts;
+  await contract.call(contract, 'reset_number', {});
+  const num: number = await contract.view('get_number', {});
+  t.is(num, 0);
+});
